@@ -1,0 +1,18 @@
+{
+  "name": "Remodel Project Tracker",
+  "short_name": "Remodel",
+  "description": "Track remodel rooms, tasks, bids, materials, calendar dates, and budget.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#283231",
+  "icons": [
+    {
+      "src": "icons/remodel-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

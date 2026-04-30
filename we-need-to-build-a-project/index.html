@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remodel Project Tracker</title>
+    <meta name="theme-color" content="#283231" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Remodel Tracker" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/remodel-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/remodel-icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <p class="eyebrow">Remodel</p>
+          <h1>Project Tracker</h1>
+        </div>
+        <nav class="nav-tabs" aria-label="Tracker views">
+          <button class="tab active" data-view="overview">Overview</button>
+          <button class="tab" data-view="rooms">Rooms</button>
+          <button class="tab" data-view="tasks">Tasks</button>
+          <button class="tab" data-view="calendar">Calendar</button>
+          <button class="tab" data-view="bids">Contractor Bids</button>
+          <button class="tab" data-view="budget">Budget</button>
+          <button class="tab" data-view="decisions">Decisions</button>
+        </nav>
+        <div class="project-card">
+          <label for="projectName">Project name</label>
+          <input id="projectName" type="text" />
+          <label for="targetDate">Target finish</label>
+          <input id="targetDate" type="date" />
+          <label for="expectedDuration">Expected time</label>
+          <input id="expectedDuration" type="text" placeholder="e.g. 12 weeks" />
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <section class="topbar">
+          <div>
+            <p class="eyebrow">Live snapshot</p>
+            <h2 id="viewTitle">Overview</h2>
+          </div>
+          <div class="actions">
+            <button class="ghost" id="printBtn">Save as PDF</button>
+            <button class="ghost" id="exportBtn">Export JSON</button>
+            <button class="ghost" id="resetBtn">Reset sample</button>
+          </div>
+        </section>
+
+        <section class="view active" id="overview">
+          <div class="stats-grid">
+            <article>
+              <span>Total budget</span>
+              <strong id="totalBudget">$0</strong>
+            </article>
+            <article>
+              <span>Estimated spend</span>
+              <strong id="totalEstimate">$0</strong>
+            </article>
+            <article>
+              <span>Tasks complete</span>
+              <strong id="taskProgress">0%</strong>
+            </article>
+            <article>
+              <span>Best bid</span>
+              <strong id="bestBid">TBD</strong>
+            </article>
+            <article>
+              <span>Total sq ft</span>
+              <strong id="totalSqft">0</strong>
+            </article>
+            <article>
+              <span>Budget / sq ft</span>
+              <strong id="budgetPerSqft">TBD</strong>
+            </article>
+            <article>
+              <span>Material costs</span>
+              <strong id="materialCosts">$0</strong>
+            </article>
+            <article>
+              <span>Supplies to buy</span>
+              <strong id="suppliesToBuy">0</strong>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-title">
+                <h3>Room Progress</h3>
+              </div>
+              <div id="roomProgress" class="stack"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-title">
+                <h3>Upcoming Work</h3>
+              </div>
+              <div id="upcomingTasks" class="stack"></div>
+            </section>
+            <section class="panel wide">
+              <div class="panel-title">
+                <h3>Bid Comparison</h3>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Contractor</th>
+                      <th>Bid</th>
+                      <th>Timeline</th>
+                      <th>Included</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bidSummary"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="rooms">
+          <form class="entry-form" id="roomForm">
+            <input name="name" placeholder="Room or area" required />
+            <input name="budget" type="number" min="0" step="100" placeholder="Budget" required />
+            <input name="sqft" type="number" min="0" step="1" placeholder="Sq ft" required />
+            <input name="duration" placeholder="Expected time" required />
+            <select name="status">
+              <option>Planning</option>
+              <option>In progress</option>
+              <option>Waiting</option>
+              <option>Done</option>
+            </select>
+            <button type="submit">Add room</button>
+            <button type="button" class="cancel-edit" data-cancel="roomForm" hidden>Cancel edit</button>
+          </form>
+          <div id="roomList" class="card-grid"></div>
+        </section>
+
+        <section class="view" id="tasks">
+          <form class="entry-form" id="taskForm">
+            <input name="title" placeholder="Task" required />
+            <select name="room" id="taskRoom"></select>
+            <input name="start" type="date" required />
+            <input name="due" type="date" required />
+            <input name="duration" placeholder="Expected time" required />
+            <select name="status">
+              <option>Todo</option>
+              <option>Doing</option>
+              <option>Blocked</option>
+              <option>Done</option>
+            </select>
+            <button type="submit">Add task</button>
+            <button type="button" class="cancel-edit" data-cancel="taskForm" hidden>Cancel edit</button>
+          </form>
+          <div id="taskList" class="stack"></div>
+        </section>
+
+        <section class="view" id="calendar">
+          <div class="dashboard-grid">
+            <section class="panel wide">
+              <div class="panel-title">
+                <div>
+                  <h3>Daily Task Calendar</h3>
+                  <p class="meta" id="calendarToday"></p>
+                </div>
+              </div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-title">
+                <h3>Upcoming Tasks</h3>
+              </div>
+              <div id="calendarTaskList" class="stack"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-title">
+                <h3>Buy Before Start</h3>
+              </div>
+              <div id="supplyList" class="stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="bids">
+          <form class="bid-form" id="bidForm">
+            <input name="contractor" placeholder="Contractor name" required />
+            <input name="amount" type="number" min="0" step="100" placeholder="Bid amount" required />
+            <input name="timeline" placeholder="Timeline, e.g. 8 weeks" required />
+            <input name="included" placeholder="Included scope" required />
+            <input name="exclusions" placeholder="Exclusions or allowances" />
+            <input name="contact" placeholder="Phone / email" />
+            <select name="status">
+              <option>Considering</option>
+              <option>Need details</option>
+              <option>Favorite</option>
+              <option>Declined</option>
+            </select>
+            <button type="submit">Add bid</button>
+            <button type="button" class="cancel-edit" data-cancel="bidForm" hidden>Cancel edit</button>
+          </form>
+          <div id="bidList" class="card-grid bid-grid"></div>
+        </section>
+
+        <section class="view" id="budget">
+          <form class="entry-form" id="expenseForm">
+            <input name="item" placeholder="Expense or allowance" required />
+            <input name="amount" type="number" min="0" step="10" placeholder="Amount" required />
+            <select name="type">
+              <option>Estimate</option>
+              <option>Committed</option>
+              <option>Paid</option>
+            </select>
+            <button type="submit">Add cost</button>
+            <button type="button" class="cancel-edit" data-cancel="expenseForm" hidden>Cancel edit</button>
+          </form>
+          <div id="expenseList" class="stack"></div>
+        </section>
+
+        <section class="view" id="decisions">
+          <form class="entry-form" id="decisionForm">
+            <input name="title" placeholder="Decision needed" required />
+            <input name="owner" placeholder="Owner" required />
+            <select name="status">
+              <option>Open</option>
+              <option>Researching</option>
+              <option>Decided</option>
+            </select>
+            <button type="submit">Add decision</button>
+            <button type="button" class="cancel-edit" data-cancel="decisionForm" hidden>Cancel edit</button>
+          </form>
+          <div id="decisionList" class="stack"></div>
+        </section>
+      </section>
+    </main>
+
+    <section class="print-report" id="printReport" aria-hidden="true"></section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
